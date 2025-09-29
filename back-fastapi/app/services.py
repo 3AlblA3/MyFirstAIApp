@@ -62,6 +62,30 @@ def increment_count() -> int:
     finally:
         db.close()
 
+def decrement_count() -> int:
+    """Decrement the count by 1 and return the new value"""
+    db = SessionLocal()
+    try:
+        count_record = db.query(CountTable).first()
+        if count_record:
+            count_record.count_number -= 1
+            db.commit()
+            db.refresh(count_record)
+            return count_record.count_number
+        else:
+            # Initialize with 1 if no count exists
+            new_count = CountTable(count_number=1)
+            db.add(new_count)
+            db.commit()
+            db.refresh(new_count)
+            return new_count.count_number
+    except Exception as e:
+        db.rollback()
+        print(f"Error incrementing count: {e}")
+        return get_count()  # Return current count on error
+    finally:
+        db.close()
+
 def startup_event():
     """Initialize database and data on startup"""
     create_tables()

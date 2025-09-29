@@ -57,6 +57,29 @@ function App() {
     }
   }
 
+  // Decrement count via API
+  const decrementCount = async () => {
+    try {
+      setError(null)
+      const response = await fetch(`${API_URL}/count/decrement`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const data = await response.json()
+      setCount(data.count || 0)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to decrement count')
+      console.error('Error decrementing count:', err)
+    }
+  }
+
   return (
     <>
       <h1>Mon premier compteur!</h1>
@@ -71,12 +94,20 @@ function App() {
             </button>
           </div>
         ) : (
-          <button onClick={incrementCount}>
-            count is {count}
-          </button>
+          <div className="counter-container">
+            <button onClick={decrementCount} className="counter-btn minus-btn">
+              −
+            </button>
+            <div className="count-display">
+              {count}
+            </div>
+            <button onClick={incrementCount} className="counter-btn plus-btn">
+              +
+            </button>
+          </div>
         )}
         <p>
-          Cliquez sur le bouton pour incrémenter le compteur.
+          Cliquez sur les boutons pour incrémenter ou décrémenter le compteur.
         </p>
       </div>
     </>
