@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from .models.count_table import get_count, increment_count
+from .services import get_count, increment_count, startup_event
 
 app = FastAPI()
 
@@ -13,6 +13,11 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
+
+# Initialize database on startup
+@app.on_event("startup")
+async def startup():
+    startup_event()
 
 @app.get("/")
 def read_root():
@@ -30,3 +35,5 @@ def increment_count_endpoint():
     # Call the database function to increment the count
     new_count = increment_count()
     return {"count": new_count}
+
+# localhost:8000/docs# pour accéder à la doc de l'api
